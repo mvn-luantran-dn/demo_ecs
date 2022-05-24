@@ -18,6 +18,27 @@ services:
       - 3000:3000
     depends_on:
       - db
+    environment:
+      REDIS_URL: redis://redis:6379/12
+  redis:
+    image: redis
+    volumes:
+      - ../../tmp/db:/var/lib/redis/data
+    command: redis-server
+    environment:
+      REDIS_URL: redis://redis:6379/12
+  sidekiq:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: bundle exec sidekiq
+    volumes:
+      - ./:/app
+    environment:
+      RAILS_ENV: "development"
+      REDIS_URL: redis://redis:6379/12
+    depends_on:
+      - redis
 volumes:
   postgres-data:
     driver: local
