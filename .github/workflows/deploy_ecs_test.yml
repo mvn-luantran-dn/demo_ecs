@@ -2,22 +2,32 @@ name: Deploy"
 on:
   workflow_dispatch:
     inputs:
-      message:
+      logLevel:
+        description: 'Log level'
         required: true
-        default: "Yes"
+        default: 'warning'
+        type: choice
+        options:
+        - info
+        - warning
+        - debug
+      print_tags:
+        description: 'True to print to STDOUT'
+        required: true
+        type: boolean
+      tags:
+        description: 'Test scenario tags'
+        required: true
+        type: string
+      environment:
+        description: 'Environment to run tests against'
+        type: environment
+        required: true
+
 jobs:
-  deploy:
+  print-tag:
     runs-on: ubuntu-latest
+    if:  ${{ inputs.print_tags }}
     steps:
-      - name: SET env.BRANCH
-        run: echo "BRANCH=$(echo ${GITHUB_REF#refs/heads/} | tr / _)" >> $GITHUB_ENV
-
-      - name: SET env.SERVICE
-        run: echo "STG_REEDU_ECS_SERVICE=${{ github.event.inputs.target }}" >> $GITHUB_ENV
-
-      - name: Show inputs
-        run: |
-          echo "branch_name: ${{ env.BRANCH }}"
-          echo "target: ${{ github.event.inputs.target }}"
-          echo "service_name: ${{ env.STG_REEDU_ECS_SERVICE }}"
-          echo "message: ${{ github.event.inputs.message }}"
+      - name: Print the input tag to STDOUT
+        run: echo  The tags are ${{ inputs.tags }}
