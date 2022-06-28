@@ -1,4 +1,4 @@
-name: "STG環境コンテナリリース"
+name: Deploy"
 on:
   workflow_dispatch:
     inputs:
