@@ -1,0 +1,18 @@
+name: Deploy
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        required: true
+        default: "Deploy"
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SET env.BRANCH
+        run: echo "BRANCH=$(echo ${GITHUB_REF#refs/heads/} | tr / _)" >> $GITHUB_ENV
+
+      - name: Show inputs
+        run: |
+          echo "branch_name: ${{ env.BRANCH }}"
+          echo "message: ${{ github.event.inputs.message }}"
