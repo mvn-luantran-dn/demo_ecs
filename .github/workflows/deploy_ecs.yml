@@ -1,5 +1,17 @@
 name: "STG環境コンテナリリース"
-on: [push]
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        type: choice
+        description: Deploy target
+        options:
+          - stg-reedu-ecs-service
+          - stg-reedu-ecs-service2
+          - stg-reedu-ecs-service3
+      message:
+        required: true
+        default: "Yes"
 jobs:
   deploy:
     runs-on: ubuntu-latest
