@@ -42,3 +42,10 @@ jobs:
           task-definition: aws_resource/ecs/task-definition.json
           container-name: rails_web
           image: ${{ steps.build-image.outputs.image }}
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: rails-web
+          cluster: demo-ecs
+          wait-for-service-stability: true

@@ -70,6 +70,11 @@ jobs:
       - name: db create
         run: bundle exec rails db:create db:schema:load --trace
 
-      - name: Run test
-        run: |
-          bin/rails test
+  test-code:
+    runs-on: ubuntu-latest
+    environment: 'Deploy'
+    needs: [rails-test]
+
+    steps:
+       - name: Run test
+         run: bin/rails test
