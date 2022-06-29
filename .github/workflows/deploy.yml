@@ -1,17 +1,13 @@
-name: "Deploy"
+name: "Deploy AWS ECS"
+
 on: [push]
 jobs:
-  deploy:
+  deploy-ecs:
     runs-on: ubuntu-latest
 
     steps:
       - name: SET env.BRANCH
         run: echo "BRANCH=$(echo ${GITHUB_REF#refs/heads/} | tr / _)" >> $GITHUB_ENV
-
-      - name: Show inputs
-        run: |
-          echo "branch_name: ${{ env.BRANCH }}"
-          echo "message: ${{ github.event.inputs.message }}"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -20,12 +16,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-       - name: Check out repository
-         uses: actions/checkout@v2
+      - name: Check out repository
+        uses: actions/checkout@v2
 
-       - name: Login to Amazon ECR
-         id: login-ecr
-         uses: aws-actions/amazon-ecr-login@v1
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
@@ -34,6 +30,15 @@ jobs:
           ECR_REPOSITORY: demo-ecs
           IMAGE_TAG: ${{ github.sha }}
         run: |
+          echo "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: aws_resource/ecs/task-definition.json
+          container-name: rails_web
+          image: ${{ steps.build-image.outputs.image }}
