@@ -41,4 +41,4 @@ jobs:
         with:
           task-definition: aws_resource/ecs/task-definition.json
           container-name: rails_web
-          image: ${{ steps.login-ecr.outputs.image }}
+          image: ${{ steps.build-image.outputs.image }}
