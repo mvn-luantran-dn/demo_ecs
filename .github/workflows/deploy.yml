@@ -6,10 +6,5 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up Ruby 2.7
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 2.7.5
-          bundler-cache: true
       - name: SET env.BRANCH
         run: echo "BRANCH=$(echo ${GITHUB_REF#refs/heads/} | tr / _)" >> $GITHUB_ENV
